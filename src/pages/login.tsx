@@ -5,18 +5,21 @@ import { FcGoogle } from "react-icons/fc";
 import { auth } from "../firebase";
 import { useLoginMutation } from "../redux/api/userAPI";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
-import { MessageResponse } from "../types/api-types";
+import {  MessageResponse } from "../types/api-types";
+import { useDispatch } from "react-redux";
+import { userExist, userNotExist } from "../redux/reducer/userReducer";
 
 const Login = () => {
   const [gender, setGender] = useState("");
   const [date, setDate] = useState("");
-
+  
+  const dispatch = useDispatch();
   const [login] = useLoginMutation();
 
   const loginHandler = async () => {
     try {
       const provider = new GoogleAuthProvider();
-      const { user } = await signInWithPopup(auth, provider);
+      const { user} = await signInWithPopup(auth, provider);
 
       console.log({
         name: user.displayName!,
@@ -38,11 +41,15 @@ const Login = () => {
         email: user.email!,
       });
 
-      if (res?.data) {
+      if (res.data) {
         toast.success(res.data.message);
-      } else {
+        dispatch(userExist(res.data.user!))
+
+      } 
+        else {
         const error = res.error as FetchBaseQueryError;
         const message = (error.data as MessageResponse).message;
+      dispatch(userNotExist());
         toast.error(message);
       }
     } catch (error) {

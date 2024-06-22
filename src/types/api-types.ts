@@ -24,6 +24,7 @@ export type CustomError = {
 export type MessageResponse = {
   success: boolean;
   message: string;
+  user?: User;
 };
 
 export type AllUsersResponse = {
